@@ -1,235 +1,248 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>N个M面骰子点数和的正态分布</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="shortcut icon" href="favicon.ico" />
-    <link rel="bookmark" href="favicon.ico" />
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/vue.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/echarts.min.js"></script>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N个M面骰子点数和的正态分布</title>
 
-  <body>
-    <div class="container">
-      <div class="row clearfix">
-        <div class="col-md-12 column">
-          <h3 class="text-center">N个M面骰子点数和的正态分布</h3>
+  <link href="css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="bookmark" href="favicon.ico" />
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/vue.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/echarts.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row clearfix">
+      <div class="col-md-12 column">
+        <h3 class="text-center">N个M面骰子点数和的正态分布</h3>
+        <br />
+        <div id="normalization">
+          <div class="input-group">
+            <span class="input-group-addon">骰子数量</span>
+            <input type="number" class="form-control" id="direCount" v-model="num" min="1" max="99" step="1"
+              placeholder="请输入1~99之间的数字" />
+          </div>
           <br />
-          <div id="normalization">
-            <div class="input-group">
-              <span class="input-group-addon">骰子数量</span>
-              <input
-                type="number"
-                class="form-control"
-                id="direCount"
-                v-model="num"
-                min="1"
-                max="99"
-                step="1"
-                placeholder="请输入1~99之间的数字"
-              />
-            </div>
-            <br />
-            <div class="input-group">
-              <span class="input-group-addon">骰子面数</span>
-              <input
-                type="number"
-                class="form-control"
-                id="direSided"
-                v-model="sided"
-                min="2"
-                max="9999"
-                step="1"
-                placeholder="请输入2~9999之间的数字"
-              />
-            </div>
-            <br />
-            <div class="form-group">
-              <button
-                type="submit"
-                class="btn btn-success btn-large"
-                @click="calcAllDiceCount"
-              >
-                计算正态分布
-              </button>
-              <span :class="countStyel">总组合数量:{{count}}</span>
-            </div>
-            <br />
-            <ul class="nav nav-tabs">
-              <li class="active">
-                <a href="#chart" data-toggle="tab"> 图形表格 </a>
-              </li>
-              <li><a href="#table" data-toggle="tab">文本表格</a></li>
-            </ul>
+          <div class="input-group">
+            <span class="input-group-addon">骰子面数</span>
+            <input type="number" class="form-control" id="direSided" v-model="sided" min="2" max="9999" step="1"
+              placeholder="请输入2~9999之间的数字" />
+          </div>
+          <br />
+          <div class="form-group">
+            <button type="submit" class="btn btn-success btn-large" @click="calcAllDiceCount">
+              计算正态分布
+            </button>
+            <span :class="countStyel">总组合数量:{{count}}</span>
+          </div>
+          <br />
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#chart" data-toggle="tab"> 图形表格 </a>
+            </li>
+            <li><a href="#table" data-toggle="tab">文本表格</a></li>
+          </ul>
 
-            <div class="tab-content">
-              <div
-                class="tab-pane fade active in"
-                id="chart"
-                style="width: auto; height: 570px"
-              ></div>
-              <div class="tab-pane fade" id="table">
-                <table class="table table-hover table-bordered">
-                  <thead>
-                    <tr>
-                      <th>点数和</th>
-                      <th>出现次数</th>
-                      <th>出现概率</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="item in list">
-                      <td>{{ item.sum }}</td>
-                      <td>{{ item.count }}</td>
-                      <td>{{ item.probability }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          <div class="tab-content">
+            <div class="tab-pane fade active in" id="chart" style="width: auto; height: 570px"></div>
+            <div class="tab-pane fade" id="table">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th>点数和</th>
+                    <th>出现次数</th>
+                    <th>出现概率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in list">
+                    <td>{{ item.sum }}</td>
+                    <td>{{ item.count }}</td>
+                    <td>{{ item.probability }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script>
-      new Vue({
-        el: "#normalization",
-        data: {
-          num: 4,
-          sided: 8,
-          nowCount: 0,
-          maxCount: 1,
-          list: new Array(),
+  <script>
+    new Vue({
+      el: "#normalization",
+      data: {
+        num: 4,
+        sided: 8,
+        nowCount: 0,
+        maxCount: 1,
+        list: new Array(),
+      },
+      computed: {
+        count: function () {
+          this.maxCount = Math.pow(this.sided, this.num);
+          return this.maxCount;
         },
-        computed: {
-          count: function () {
-            this.maxCount = Math.pow(this.sided, this.num);
-            return this.maxCount;
-          },
-          countStyel: function () {
-            if (this.maxCount <= 10000) return "label label-primary";
-            if (this.maxCount <= 100000) return "label label-info";
-            if (this.maxCount <= 10000000) return "label label-warning";
-            return "label label-danger";
-          },
+        countStyel: function () {
+          if (this.maxCount <= 10000) return "label label-primary";
+          if (this.maxCount <= 100000) return "label label-info";
+          if (this.maxCount <= 10000000) return "label label-warning";
+          return "label label-danger";
         },
-        methods: {
-          getDiceCount(n, m, sum) {
-            //排除不符合的情况
-            if (n < 1 || m < 2 || sum < n || sum > n * m) return 0;
-            if (n == 1) return 1; //1个骰子的情况
+      },
+      methods: {
+        getDiceCount(n, m, sum) {
+          //排除不符合的情况
+          if (n < 1 || m < 2 || sum < n || sum > n * m) return 0;
+          if (n == 1) return 1; //1个骰子的情况
 
-            var c = 0;
+          var c = 0;
 
-            for (var i = 1; i <= m; i++) {
-              c += this.getDiceCount(n - 1, m, sum - i);
+          for (var i = 1; i <= m; i++) {
+            c += this.getDiceCount(n - 1, m, sum - i);
+          }
+          return c;
+        },
+        calcAllDiceCount() {
+          this.nowCount = 0;
+          this.list = new Array(); //初始化数组
+          var sumArray = new Array(); //骰子和的数组
+          var countArray = new Array(); //组合数量数组
+          var probabilityArray = new Array(); //百分比数组
+
+          var sumCount = this.num * (this.sided - 1) + 1; //骰子和的种数
+          var forMax = Math.floor(sumCount / 2); //最大循环次数
+
+          for (var i = 0; i < forMax; i++) {
+            var s = parseInt(this.num) + parseInt(i); //当前计算的骰子和
+            var c = this.getDiceCount(this.num, this.sided, s); //计算指定和的骰子组合数量
+            var p = (c / this.maxCount) * 100; //计算占比
+
+            this.nowCount += c * 2; //保存当前已计算数量
+
+            //右侧数据
+            var sRight = this.num * this.sided - i;
+            var iRight = sumCount - i - 1;
+
+            this.list[iRight] = {
+              sum: sRight,
+              count: c,
+              probability: p + "%",
             }
-            return c;
-          },
-          calcAllDiceCount() {
-            this.nowCount = 0;
-            this.list = new Array();
-            var sumArray = new Array();
-            var countArray = new Array();
-            var probabilityArray = new Array();
-            for (var s = this.num; s <= this.num * this.sided; s++) {
-              var c = this.getDiceCount(this.num, this.sided, s);
-              this.nowCount += c;
-              var p = (c / this.maxCount) * 100;
-              this.list.push({
-                sum: s,
-                count: c,
-                probability: p + "%",
-              });
-              sumArray.push(s + "点");
-              countArray.push(c);
-              probabilityArray.push(p);
-            }
-            this.drawChart(sumArray, countArray, probabilityArray);
-          },
-          drawChart(sumArray, countArray, probabilityArray) {
-            var dom = document.getElementById("chart");
-            var myChart = echarts.init(dom);
 
-            option = {
-              color: ["#5470C6", "#EE6666"],
-              tooltip: {
-                trigger: "axis",
-                axisPointer: {
-                  type: "cross",
+            //左侧数据
+            this.list[i] = {
+              sum: s,
+              count: c,
+              probability: p + "%",
+            }
+
+            sumArray[i] = (s + "点");
+            sumArray[iRight] = (sRight + "点");
+            countArray[i] = c;
+            countArray[iRight] = c;
+            probabilityArray[i] = p;
+            probabilityArray[iRight] = p;
+          }
+
+          if (this.nowCount < this.maxCount) {
+            var iMid = forMax;
+            var sMid = parseInt(this.num) + parseInt(iMid);
+            var cMid = this.maxCount - this.nowCount;
+            var pMid = (cMid / this.maxCount) * 100;
+            //中间数据
+            this.list[iMid] = {
+              sum: sMid,
+              count: cMid,
+              probability: pMid + "%",
+            }
+            sumArray[iMid] = (sMid + "点");
+            countArray[iMid] = cMid;
+            probabilityArray[iMid] = pMid;
+          }
+
+          this.drawChart(sumArray, countArray, probabilityArray);
+        },
+        drawChart(sumArray, countArray, probabilityArray) {
+          var dom = document.getElementById("chart");
+          var myChart = echarts.init(dom);
+
+          option = {
+            color: ["#5470C6", "#EE6666"],
+            tooltip: {
+              trigger: "axis",
+              axisPointer: {
+                type: "cross",
+              },
+            },
+            legend: {
+              data: ["次数", "概率"],
+            },
+            xAxis: [{
+              type: "category",
+              axisTick: {
+                alignWithLabel: true,
+              },
+              data: sumArray,
+            }, ],
+            yAxis: [{
+                type: "value",
+                name: "出现次数",
+                position: "left",
+                axisLine: {
+                  show: true,
+                  lineStyle: {
+                    color: "#5470C6",
+                  },
+                },
+                axisLabel: {
+                  formatter: "{value} 次",
                 },
               },
-              legend: {
-                data: ["次数", "概率"],
+              {
+                type: "value",
+                name: "出现概率",
+                position: "right",
+                axisLine: {
+                  show: true,
+                  lineStyle: {
+                    color: "#EE6666",
+                  },
+                },
+                axisLabel: {
+                  formatter: "{value} %",
+                },
               },
-              xAxis: [
-                {
-                  type: "category",
-                  axisTick: {
-                    alignWithLabel: true,
-                  },
-                  data: sumArray,
-                },
-              ],
-              yAxis: [
-                {
-                  type: "value",
-                  name: "出现次数",
-                  position: "left",
-                  axisLine: {
-                    show: true,
-                    lineStyle: {
-                      color: "#5470C6",
-                    },
-                  },
-                  axisLabel: {
-                    formatter: "{value} 次",
-                  },
-                },
-                {
-                  type: "value",
-                  name: "出现概率",
-                  position: "right",
-                  axisLine: {
-                    show: true,
-                    lineStyle: {
-                      color: "#EE6666",
-                    },
-                  },
-                  axisLabel: {
-                    formatter: "{value} %",
-                  },
-                },
-              ],
-              series: [
-                {
-                  name: "出现次数",
-                  type: "bar",
-                  data: countArray,
-                },
-                {
-                  name: "出现概率",
-                  type: "line",
-                  smooth: true,
-                  yAxisIndex: 1,
-                  data: probabilityArray,
-                },
-              ],
-            };
+            ],
+            series: [{
+                name: "出现次数",
+                type: "bar",
+                data: countArray,
+              },
+              {
+                name: "出现概率",
+                type: "line",
+                smooth: true,
+                yAxisIndex: 1,
+                data: probabilityArray,
+              },
+            ],
+          };
 
-            if (option && typeof option === "object") {
-              myChart.setOption(option);
-            }
-          },
+          if (option && typeof option === "object") {
+            myChart.setOption(option);
+          }
         },
-      });
-    </script>
-  </body>
+      },
+    });
+  </script>
+</body>
+
 </html>
